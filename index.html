@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Frontend Refactoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<div class="impress-progressbar"><div></div></div>
+<div id="snum">01 / 09</div>
+<div id="hint">→ or space to advance</div>
+
+<div id="impress"
+  data-width="960" data-height="560"
+  data-max-scale="1" data-min-scale="0"
+  data-perspective="1200"
+  data-transition-duration="850">
+
+
+  <!-- ══ SLIDE 1 — TITLE ══ -->
+  <div class="step cover" id="s1" data-x="0" data-y="0" data-z="0" data-scale="1">
+    <div class="cover-glow"></div>
+    <div class="cover-dots">
+      <span style="top:70px;right:50px;width:48px;height:48px;animation-delay:0s"></span>
+      <span style="top:160px;right:110px;width:26px;height:26px;animation-delay:.8s"></span>
+      <span style="top:260px;right:65px;width:65px;height:65px;animation-delay:.4s"></span>
+      <span style="top:380px;right:35px;width:34px;height:34px;animation-delay:1.2s"></span>
+    </div>
+    <div class="badge ai d1">Admin Portal · Marketplace</div>
+    <h1 class="ai d2">Refactoring &amp;<em>Performance</em></h1>
+    <p class="subtitle ai d3" style="max-width:520px;text-align:left;margin-top:14px;">
+      How we transformed legacy Angular modules into scalable, maintainable architecture.
+    </p>
+    <div class="anim-item d4" style="display: flex;justify-content: center;margin-top: 20px">
+        <img src="./img/welcome.gif" alt="" srcset="">
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 2 — CHALLENGES ══ -->
+  <div class="step" id="s2" data-x="1400" data-y="0" data-z="0" data-rotate-y="16" data-scale="1"
+       data-reveal-count="4">
+    <div class="badge ai">Initial challenges</div>
+    <h2 class="ai d1">Why refactoring was needed</h2>
+    <p class="subtitle ai d2">Four problem areas directly impacting velocity, quality, and user experience.</p>
+
+    <div class="cols2" style="margin-top:14px;">
+      <div>
+        <div class="ci" data-reveal="1">
+           <span><strong style="color:var(--r)">Architecture</strong> — scattered files, no clear ownership</span>
+        </div>
+        <div class="ci" data-reveal="3">
+           <span><strong style="color:#CC88FF">Type safety</strong> — <span class="mono amber">any</span> everywhere, missing models</span>
+        </div>
+      </div>
+      <div>
+        <div class="ci" data-reveal="2">
+           <span><strong style="color:var(--b)">Performance</strong> — search fired on every keystroke</span>
+        </div>
+        <div class="ci" data-reveal="4">
+           <span><strong style="color:var(--g)">UX</strong> — filters buried in modals, 3+ clicks for basic tasks</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="ai d6" style="margin-top:18px;display:flex;gap:10px;">
+      <div class="ic" style="flex:1;text-align:center;padding:14px 8px;">
+        <div class="stat-num" id="cnt1">0</div>
+        <div class="stat-label">issues found</div>
+      </div>
+      <div class="ic" style="flex:1;text-align:center;padding:14px 8px;">
+        <div class="stat-num" id="cnt2">0</div>
+        <div class="stat-label">modules impacted</div>
+      </div>
+      <div class="ic" style="flex:1;text-align:center;padding:14px 8px;">
+        <div class="stat-num" style="color:var(--r)" id="cnt3">0</div>
+        <div class="stat-label">risk areas</div>
+      </div>
+    </div> -->
+  </div>
+
+
+  <!-- ══ SLIDE 3 — BEFORE: COHORT ══ -->
+  <div class="step" id="s3" data-x="2900" data-y="-280" data-z="-350" data-rotate="9" data-scale="1"
+       data-reveal-count="3">
+    <div class="badge ai">Before: cohort module</div>
+    <h2 class="ai d1">The duplication problem</h2>
+    <p class="subtitle ai d2">7 nearly identical components — only the endpoint differed. Any bug fix meant updating 7 files.</p>
+
+    <div class="cols2" style="margin-top:14px;">
+      <div class="ic as d3">
+        <div class="ic-label bad">Scattered structure</div>
+        <div class="tree">
+          <div><span class="r">cohort/</span></div>
+          <div>&nbsp;&nbsp;cohort.components/ <span class="d">← mixed concerns</span></div>
+          <div>&nbsp;&nbsp;+ 5 more nearly identical files<span class="d"></span></div>
+          <div><span class="r">other-module/</span></div>
+          <div>&nbsp;&nbsp;services/ <span class="d">← some logic here…</span></div>
+          <div><span class="r">shared/</span></div>
+          <div>&nbsp;&nbsp;random.ts <span class="d">← …and here</span></div>
+          <div><span class="r">service/</span></div>
+          <div>&nbsp;&nbsp;cohort.service.ts <span class="d">← …some here</span></div>
+          <div><span class="r">core/</span></div>
+          <div>&nbsp;&nbsp;model.ts <span class="d">← …some here</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="ci" data-reveal="1">
+          <span class="cdot" style="background:var(--r)"></span>
+          Every fix required <span style="color:var(--r);font-weight:600;">7×</span> the effort
+        </div>  
+      </div>
+    </div>
+  </div>
+
+    <!-- ══ SLIDE 5 — TYPE SAFETY ══ -->
+
+  <!-- ══ SLIDE 4 — AFTER: STRUCTURE ══ -->
+  <div class="step" id="s4" data-x="4300" data-y="-180" data-z="150" data-rotate="-7" data-scale="1"
+       data-reveal-count="3">
+    <div class="badge ai">After: refactored</div>
+    <h2 class="ai d1">Domain-driven structure</h2>
+    <p class="subtitle ai d2">7 components collapsed into 1 configurable component. Owned in one place.</p>
+
+    <div class="cols2" style="margin-top:14px;">
+      <div class="ic al d3">
+        <div class="ic-label good">Clean structure</div>
+        <div class="tree">
+          <div><span class="g">cohort/</span></div>
+          <div>&nbsp;&nbsp;<span class="g">pages/</span></div>
+          <div>&nbsp;&nbsp;<span class="g">components/</span></div>
+          <div>&nbsp;&nbsp;<span class="g">data-access/</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">models/</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">services/</span></div>
+          <div>&nbsp;&nbsp;cohort.module.ts</div>
+          <div>&nbsp;&nbsp;cohort-routing.ts</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="ic as d4">
+          <div class="ic-label good">1 reusable component</div>
+          <div class="code">
+<span class="cm">// 7 components → 1</span><br/>
+<span class="kw">@Input()</span> endpoint: <span class="vl">string</span>;<br/>
+<span class="gl">// fully configurable</span>
+          </div>
+        </div>
+        <div>
+          <div class="ci" data-reveal="1"><span class="cdot" style="background:var(--g)"></span>Services centralized in data-access</div>
+          <div class="ci" data-reveal="2"><span class="cdot" style="background:var(--g)"></span>Models grouped by business domain</div>
+          <div class="ci" data-reveal="3"><span class="cdot" style="background:var(--g)"></span>Predictable — new devs find things instantly</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="step" id="s5" data-x="4300" data-y="1300" data-z="-500" data-rotate-y="24" data-scale="1"
+       data-reveal-count="2">
+    <div class="badge ai">Code quality</div>
+    <h2 class="ai d1">From runtime bugs → build-time errors</h2>
+    <p class="subtitle ai d2">Weak TypeScript was hiding silent failures until production.</p>
+
+    <div class="cols2" style="margin-top:14px;">
+      <div class="ic al d3">
+        <div class="ic-label bad">Before</div>
+        <div class="code">
+            <span class="cm">// Silent bugs everywhere</span><br/>
+            <span class="kw">interface</span> User {<br/>
+            &nbsp;&nbsp;name: <span class="rl">any</span>;<br/>
+            &nbsp;&nbsp;data: <span class="rl">any</span>;<br/>
+            }<br/>
+            <span class="cm">// Error found at runtime ✗</span>
+        </div>
+      </div>
+      <div>
+        <div class="ic as d4">
+          <div class="ic-label good">After</div>
+          <div class="code">
+            <span class="gl">// Utility types</span><br/>
+            <span class="kw">type</span> CreateUser =<br/>
+            &nbsp;&nbsp;Omit&lt;User,<span class="vl">'id'|'createdAt'</span>&gt;;<br/>
+            <span class="kw">type</span> Patch =<br/>
+            &nbsp;&nbsp;Partial&lt;Pick&lt;User,<span class="vl">'name'</span>&gt;&gt;;<br/>
+            <span class="gl">// Error at BUILD TIME ✓</span>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="ci" data-reveal="1"><span class="cdot" style="background:var(--g)"></span>Proper models &amp; interfaces throughout</div>
+          <div class="ci" data-reveal="2"><span class="cdot" style="background:var(--g)"></span>Separation: UI · Services · Models</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 6 — PERFORMANCE ══ -->
+  <div class="step" id="s6" data-x="2800" data-y="1900" data-z="-150" data-rotate="6" data-scale="1"
+       data-reveal-count="3">
+    <div class="badge ai">Performance</div>
+    <h2 class="ai d1">Fewer requests. Fewer re-renders.</h2>
+    <p class="subtitle ai d2">Architecture changes with direct impact on API load and perceived speed.</p>
+
+    <div class="cols2" style="margin-top:14px;">
+      <div>
+        <div class="ic al d3" style="margin-bottom:10px;">
+          <div class="ic-label bad">Before — every keystroke</div>
+          <div class="code" style="font-size:10.5px;">
+<span class="cm">// 50+ requests per sentence</span><br/>
+onSearch(q: <span class="rl">any</span>) {<br/>
+&nbsp;&nbsp;<span class="rl">this.api.search(q);</span><br/>
+}
+          </div>
+        </div>
+        <div class="ic al d4">
+          <div class="ic-label good">After — debounced</div>
+          <div class="code" style="font-size:10.5px;">
+<span class="cm">// Request only after pause</span><br/>
+<span class="kw">this.search$</span>.pipe(<br/>
+&nbsp;&nbsp;<span class="gl">debounceTime(300)</span>,<br/>
+&nbsp;&nbsp;distinctUntilChanged()<br/>
+);<span class="gl"> // ~90% fewer requests</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="ci" data-reveal="1"><span class="cdot" style="background:var(--b)"></span><strong style="color:var(--b)">OnPush</strong> change detection — skip unchanged trees</div>
+        <div class="ci" data-reveal="2"><span class="cdot" style="background:var(--g)"></span><strong style="color:var(--g)">trackBy</strong> on all lists — no full DOM rebuilds</div>
+        <div class="ci" data-reveal="3"><span class="cdot" style="background:var(--a)"></span><strong style="color:var(--a)">Lazy loading</strong> per module — faster initial load</div>
+        <div class="ic as d5" style="margin-top:4px;text-align:center;">
+          <div class="big-num grn">~90%</div>
+          <div class="big-label">search requests reduced</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 7 — UX ══ -->
+  <div class="step" id="s7" data-x="1300" data-y="1900" data-z="-1100" data-rotate-y="-20" data-scale="1"
+       data-reveal-count="3">
+    <div class="badge ai">UX</div>
+    <h2 class="ai d1">Reducing friction</h2>
+    <p class="subtitle ai d2">Filters moved from buried modals to inline — cutting clicks per action from 3+ to 1.</p>
+
+    <div class="cols2" style="margin-top:14px;">
+      <div class="ic al d3">
+        <div class="ic-label bad">Before — filters in modal</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+           <img src="./img/before.png" alt="" srcset="" style="width:80%;border-radius:6px;box-shadow:0 0 0 1px rgba(255,255,255,.04)">
+        </div>
+      </div>
+      <div>
+        <div class="ic as d4">
+          <div class="ic-label good">After — inline filters</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">
+            <img src="./img/after.png" alt="" srcset="" style="width:100%;border-radius:6px;box-shadow:0 0 0 1px rgba(255,255,255,.04)">
+          </div>
+          <div style="font-size:9px;color:var(--g);margin-top:8px;">1 click · no interruption</div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="ci" data-reveal="1"><span class="cdot" style="background:var(--g)"></span>Cleaner, readable interface</div>
+          <div class="ci" data-reveal="2"><span class="cdot" style="background:var(--g)"></span>Consistent patterns across all modules</div>
+          <div class="ci" data-reveal="3"><span class="cdot" style="background:var(--g)"></span>Reduced cognitive load for users</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 9 — NEXT ══ -->
+  <div class="step" id="s8"
+       style="background:linear-gradient(155deg,#07090F 65%,#050D0A 100%);border-color:rgba(0,229,160,.09);"
+       data-x="-1500" data-y="-900" data-z="500" data-rotate="0" data-scale="1"
+       data-reveal-count="4">
+    <div class="badge ai">Next</div>
+    <h2 class="ai d1">Foundation is solid. What's next.</h2>
+    <p class="subtitle ai d2">The hard structural work is done. These build on top of it.</p>
+
+    <div class="cols2" style="margin-top:16px;">
+      <div>
+        <div class="result-row" data-reveal="1"><div class="rdot"></div><span><span class="rkey">Unit tests</span> — expand coverage across refactored modules</span></div>
+        <div class="result-row" data-reveal="2"><div class="rdot"></div><span><span class="rkey">Shared design system</span> — shared UI component library for consistency</span></div>
+        <div class="result-row" data-reveal="3"><div class="rdot"></div><span><span class="rkey">State management</span> — NgRx / signals where complexity warrants</span></div>
+        <div class="result-row" data-reveal="4"><div class="rdot"></div><span><span class="rkey">Performance monitoring</span> — track render times &amp; API frequency in production</span></div>
+      </div>
+      <div class="ic ai d5" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:32px 24px;">
+        <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:rgba(0,229,160,.12);line-height:1">This is a</div>
+        <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--g);line-height:1.1">foundation,</div>
+        <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:rgba(0,229,160,.12);line-height:1">not a finish</div>
+        <div style="margin-top:16px;font-size:11.5px;color:#2A4050;line-height:1.8;">Clean architecture makes every<br/>future change faster and safer.</div>
+      </div>
+    </div>
+  </div>
+
+   <div class="step" id="s9"
+       style="background:linear-gradient(155deg,#07090F 65%,#050D0A 100%);border-color:rgba(0,229,160,.09);"
+       data-x="-1500" data-y="-900" data-z="500" data-rotate="0" data-scale="1"
+       data-reveal-count="4">
+    <div class="badge ai">Next</div>
+         <div>
+       <img src="./img/adel-emam.gif" alt="" srcset="" style="width:100%;border-radius:6px;box-shadow:0 0 0 1px rgba(255,255,255,.04)">
+    </div>
+  </div>
+
+   <div class="step" id="s10"
+       style="background:linear-gradient(155deg,#07090F 65%,#050D0A 100%);border-color:rgba(0,229,160,.09);"
+       data-x="-1500" data-y="-900" data-z="500" data-rotate="0" data-scale="1"
+       data-reveal-count="4">
+    <div class="badge ai">thanks</div>
+      <div>
+      <img src="./img/thank-you.webp" style="width:100%;border-radius:6px;box-shadow:0 0 0 1px rgba(255,255,255,.04);margin-top:14px">
+    </div>
+  </div>
+
+</div><!-- /impress -->
+
+<script>
+
+var revealState = {};  // stepId → next reveal index
+
+function getRevealItems(step) {
+  return Array.from(step.querySelectorAll('[data-reveal]'))
+    .sort(function(a,b){ return +a.dataset.reveal - +b.dataset.reveal; });
+}
+
+function initReveal(step) {
+  var id = step.id;
+  revealState[id] = 0;
+  getRevealItems(step).forEach(function(el){
+    el.classList.remove('visible');
+  });
+}
+
+function revealNext(step) {
+  var id = step.id;
+  var items = getRevealItems(step);
+  var count = +step.dataset.revealCount || 0;
+  if (!count) return true; // no reveals, go to next slide
+  var idx = revealState[id] || 0;
+  if (idx >= items.length) return true; // all revealed, go to next slide
+  items[idx].classList.add('visible');
+  revealState[id] = idx + 1;
+  return false; // stay on this slide
+}
+
+/* ──────────────────────────────────────────────
+   IMPRESS CORE (minified)
+   ────────────────────────────────────────────── */
+(function(document,window){"use strict";var lib;var pfx=(function(){var style=document.createElement("dummy").style,prefixes="Webkit Moz O ms Khtml".split(" "),memory={};return function(prop){if(typeof memory[prop]==="undefined"){var ucProp=prop.charAt(0).toUpperCase()+prop.substr(1),props=(prop+" "+prefixes.join(ucProp+" ")+ucProp).split(" ");memory[prop]=null;for(var i in props){if(style[props[i]]!==undefined){memory[prop]=props[i];break;}}}return memory[prop];}})();var validateOrder=function(order,fallback){var validChars="xyz",returnStr="";if(typeof order==="string"){for(var i in order.split("")){if(validChars.indexOf(order[i])>=0){returnStr+=order[i];validChars=validChars.split(order[i]).join("");}}}return returnStr||(fallback!==undefined?fallback:"xyz");};var css=function(el,props){var key,pkey;for(key in props){if(props.hasOwnProperty(key)){pkey=pfx(key);if(pkey!==null)el.style[pkey]=props[key];}}return el;};var translate=function(t){return" translate3d("+t.x+"px,"+t.y+"px,"+t.z+"px) ";};var rotate=function(r,revert){var order=r.order||"xyz",cssStr="",axes=order.split("");if(revert)axes=axes.reverse();for(var i=0;i<axes.length;i++)cssStr+=" rotate"+axes[i].toUpperCase()+"("+r[axes[i]]+"deg)";return cssStr;};var scale=function(s){return" scale("+s+") ";};var computeWindowScale=function(config){var hScale=window.innerHeight/config.height,wScale=window.innerWidth/config.width,sc=hScale>wScale?wScale:hScale;if(config.maxScale&&sc>config.maxScale)sc=config.maxScale;if(config.minScale&&sc<config.minScale)sc=config.minScale;return sc;};var body=document.body;var impressSupported=(pfx("perspective")!==null)&&body.classList&&body.dataset;if(!impressSupported)body.className+=" impress-not-supported ";var roots={},preInitPlugins=[],preStepLeavePlugins=[],defaults={width:1024,height:768,maxScale:1,minScale:0,perspective:1000,transitionDuration:1000};var empty=function(){return false;};var impress=window.impress=function(rootId){if(!impressSupported)return{init:empty,goto:empty,prev:empty,next:empty,swipe:empty,tear:empty,lib:{}};rootId=rootId||"impress";if(roots["impress-root-"+rootId])return roots["impress-root-"+rootId];lib=initLibraries(rootId);body.classList.remove("impress-not-supported");body.classList.add("impress-supported");var stepsData={},activeStep=null,currentState=null,steps=null,config=null,windowScale=null,root=lib.util.byId(rootId),canvas=document.createElement("div"),initialized=false,lastEntered=null;var onStepEnter=function(step){if(lastEntered!==step){lib.util.triggerEvent(step,"impress:stepenter");lastEntered=step;}lib.util.triggerEvent(step,"impress:steprefresh");};var onStepLeave=function(currentStep,nextStep){if(lastEntered===currentStep){lib.util.triggerEvent(currentStep,"impress:stepleave",{next:nextStep});lastEntered=null;}};var initStep=function(el,idx){var data=el.dataset,step={translate:{x:lib.util.toNumber(data.x),y:lib.util.toNumber(data.y),z:lib.util.toNumber(data.z)},rotate:{x:lib.util.toNumber(data.rotateX),y:lib.util.toNumber(data.rotateY),z:lib.util.toNumber(data.rotateZ||data.rotate),order:validateOrder(data.rotateOrder)},scale:lib.util.toNumber(data.scale,1),transitionDuration:lib.util.toNumber(data.transitionDuration,config.transitionDuration),el:el};if(!el.id)el.id="step-"+(idx+1);stepsData["impress-"+el.id]=step;css(el,{position:"absolute",transform:"translate(-50%,-50%)"+translate(step.translate)+rotate(step.rotate)+scale(step.scale),transformStyle:"preserve-3d"});};var initAllSteps=function(){steps=lib.util.$$(".step",root);steps.forEach(initStep);};var init=function(){if(initialized)return;execPreInitPlugins(root);var meta=lib.util.$("meta[name='viewport']")||document.createElement("meta");meta.content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no";if(meta.parentNode!==document.head){meta.name="viewport";document.head.appendChild(meta);}var rootData=root.dataset;config={width:lib.util.toNumber(rootData.width,defaults.width),height:lib.util.toNumber(rootData.height,defaults.height),maxScale:lib.util.toNumber(rootData.maxScale,defaults.maxScale),minScale:lib.util.toNumber(rootData.minScale,defaults.minScale),perspective:lib.util.toNumber(rootData.perspective,defaults.perspective),transitionDuration:lib.util.toNumber(rootData.transitionDuration,defaults.transitionDuration)};windowScale=computeWindowScale(config);lib.util.arrayify(root.childNodes).forEach(function(el){canvas.appendChild(el);});root.appendChild(canvas);document.documentElement.style.height="100%";css(body,{height:"100%",overflow:"hidden"});var rs={position:"absolute",transformOrigin:"top left",transition:"all 0s ease-in-out",transformStyle:"preserve-3d"};css(root,rs);css(root,{top:"50%",left:"50%",perspective:(config.perspective/windowScale)+"px",transform:scale(windowScale)});css(canvas,rs);body.classList.remove("impress-disabled");body.classList.add("impress-enabled");initAllSteps();currentState={translate:{x:0,y:0,z:0},rotate:{x:0,y:0,z:0,order:"xyz"},scale:1};initialized=true;lib.util.triggerEvent(root,"impress:init",{api:roots["impress-root-"+rootId]});};var getStep=function(step){if(typeof step==="number")step=step<0?steps[steps.length+step]:steps[step];else if(typeof step==="string")step=lib.util.byId(step);return(step&&step.id&&stepsData["impress-"+step.id])?step:null;};var stepEnterTimeout=null;var goto=function(el,duration,reason,origEvent){reason=reason||"goto";origEvent=origEvent||null;if(!initialized)return false;initAllSteps();if(!(el=getStep(el)))return false;window.scrollTo(0,0);var step=stepsData["impress-"+el.id];duration=(duration!==undefined?duration:step.transitionDuration);if(activeStep&&activeStep!==el){var event={target:activeStep,detail:{next:el,transitionDuration:duration,reason:reason}};if(origEvent)event.origEvent=origEvent;if(execPreStepLeavePlugins(event)===false)return false;el=event.detail.next;step=stepsData["impress-"+el.id];duration=event.detail.transitionDuration;}if(activeStep){activeStep.classList.remove("active");body.classList.remove("impress-on-"+activeStep.id);}el.classList.add("active");body.classList.add("impress-on-"+el.id);var target={rotate:{x:-step.rotate.x,y:-step.rotate.y,z:-step.rotate.z,order:step.rotate.order},translate:{x:-step.translate.x,y:-step.translate.y,z:-step.translate.z},scale:1/step.scale};var zoomin=target.scale>=currentState.scale;duration=lib.util.toNumber(duration,config.transitionDuration);var delay=duration/2;if(el===activeStep)windowScale=computeWindowScale(config);var targetScale=target.scale*windowScale;if(activeStep&&activeStep!==el)onStepLeave(activeStep,el);css(root,{perspective:(config.perspective/targetScale)+"px",transform:scale(targetScale),transitionDuration:duration+"ms",transitionDelay:(zoomin?delay:0)+"ms"});css(canvas,{transform:rotate(target.rotate,true)+translate(target.translate),transitionDuration:duration+"ms",transitionDelay:(zoomin?0:delay)+"ms"});if(currentState.scale===target.scale||(currentState.rotate.x===target.rotate.x&&currentState.rotate.y===target.rotate.y&&currentState.rotate.z===target.rotate.z&&currentState.translate.x===target.translate.x&&currentState.translate.y===target.translate.y&&currentState.translate.z===target.translate.z))delay=0;currentState=target;activeStep=el;window.clearTimeout(stepEnterTimeout);stepEnterTimeout=window.setTimeout(function(){onStepEnter(activeStep);},duration+delay);return el;};var prev=function(e){var p=steps.indexOf(activeStep)-1;p=p>=0?steps[p]:steps[steps.length-1];return goto(p,undefined,"prev",e);};var next=function(e){var n=steps.indexOf(activeStep)+1;n=n<steps.length?steps[n]:steps[0];return goto(n,undefined,"next",e);};var swipe=function(pct){if(Math.abs(pct)>1)return;var event={target:activeStep,detail:{swipe:pct,transitionDuration:config.transitionDuration}};var idx;if(pct<0){idx=steps.indexOf(activeStep)+1;event.detail.next=idx<steps.length?steps[idx]:steps[0];event.detail.reason="next";}else if(pct>0){idx=steps.indexOf(activeStep)-1;event.detail.next=idx>=0?steps[idx]:steps[steps.length-1];event.detail.reason="prev";}else return;if(execPreStepLeavePlugins(event)===false)return false;var ns=stepsData["impress-"+event.detail.next.id],k=Math.abs(pct),nsc=ns.scale*windowScale,is={translate:{x:interpolate(currentState.translate.x,-ns.translate.x,k),y:interpolate(currentState.translate.y,-ns.translate.y,k),z:interpolate(currentState.translate.z,-ns.translate.z,k)},rotate:{x:interpolate(currentState.rotate.x,-ns.rotate.x,k),y:interpolate(currentState.rotate.y,-ns.rotate.y,k),z:interpolate(currentState.rotate.z,-ns.rotate.z,k),order:k<0.7?currentState.rotate.order:ns.rotate.order},scale:interpolate(currentState.scale,nsc,k)};css(root,{perspective:config.perspective/is.scale+"px",transform:scale(is.scale),transitionDuration:"0ms",transitionDelay:"0ms"});css(canvas,{transform:rotate(is.rotate,true)+translate(is.translate),transitionDuration:"0ms",transitionDelay:"0ms"});};var tear=function(){lib.gc.teardown();delete roots["impress-root-"+rootId];};lib.gc.addEventListener(root,"impress:init",function(){steps.forEach(function(step){step.classList.add("future");});lib.gc.addEventListener(root,"impress:stepenter",function(e){e.target.classList.remove("past","future");e.target.classList.add("present");},false);lib.gc.addEventListener(root,"impress:stepleave",function(e){e.target.classList.remove("present");e.target.classList.add("past");},false);},false);lib.gc.addEventListener(root,"impress:init",function(){var lastHash="";lib.gc.addEventListener(root,"impress:stepenter",function(e){window.location.hash=lastHash="#/"+e.target.id;},false);lib.gc.addEventListener(window,"hashchange",function(){if(window.location.hash!==lastHash)goto(lib.util.getElementFromHash());},false);goto(lib.util.getElementFromHash()||steps[0],0);},false);body.classList.add("impress-disabled");return(roots["impress-root-"+rootId]={init:init,goto:goto,next:next,prev:prev,swipe:swipe,tear:tear,lib:lib});};impress.supported=impressSupported;var libraryFactories={};impress.addLibraryFactory=function(obj){for(var l in obj){if(obj.hasOwnProperty(l))libraryFactories[l]=obj[l];}};var initLibraries=function(rootId){var lib={};for(var l in libraryFactories){if(libraryFactories.hasOwnProperty(l)){if(lib[l]!==undefined)throw"impress.js ERROR: "+l;lib[l]=libraryFactories[l](rootId);}}return lib;};impress.addPreInitPlugin=function(plugin,weight){weight=parseInt(weight)||10;if(weight<=0)throw"weight>0";if(!preInitPlugins[weight])preInitPlugins[weight]=[];preInitPlugins[weight].push(plugin);};var execPreInitPlugins=function(root){for(var i=0;i<preInitPlugins.length;i++){var tl=preInitPlugins[i];if(tl)for(var j=0;j<tl.length;j++)tl[j](root);}};impress.addPreStepLeavePlugin=function(plugin,weight){weight=parseInt(weight)||10;if(weight<=0)throw"weight>0";if(!preStepLeavePlugins[weight])preStepLeavePlugins[weight]=[];preStepLeavePlugins[weight].push(plugin);};var execPreStepLeavePlugins=function(event){for(var i=0;i<preStepLeavePlugins.length;i++){var tl=preStepLeavePlugins[i];if(tl)for(var j=0;j<tl.length;j++)if(tl[j](event)===false)return false;}};
+})(document,window);
+
+(function(document,window){"use strict";var roots=[],rootsCount=0,startingState={roots:[]};var lf=function(rootId){if(roots[rootId])return roots[rootId];var el=[],ev=[],cb=[];recordStartingState(rootId);var pushElement=function(e){el.push(e);};var appendChild=function(p,e){p.appendChild(e);pushElement(e);};var pushEventListener=function(t,type,fn){ev.push({target:t,type:type,listener:fn});};var addEventListener=function(t,type,fn){t.addEventListener(type,fn);pushEventListener(t,type,fn);};var pushCallback=function(c){cb.push(c);};pushCallback(function(rId){resetStartingState(rId);});var teardown=function(){var i;for(i=cb.length-1;i>=0;i--)cb[i](rootId);cb=[];for(i=0;i<el.length;i++)el[i].parentElement.removeChild(el[i]);el=[];for(i=0;i<ev.length;i++)ev[i].target.removeEventListener(ev[i].type,ev[i].listener);};var lib={pushElement:pushElement,appendChild:appendChild,pushEventListener:pushEventListener,addEventListener:addEventListener,pushCallback:pushCallback,teardown:teardown};roots[rootId]=lib;rootsCount++;return lib;};window.impress.addLibraryFactory({gc:lf});var recordStartingState=function(rootId){startingState.roots[rootId]={steps:[]};var s=document.getElementById(rootId).querySelectorAll(".step");for(var i=0;i<s.length;i++)startingState.roots[rootId].steps.push({el:s[i],id:s[i].getAttribute("id")});if(rootsCount===0){startingState.body={impressNotSupported:document.body.classList.contains("impress-not-supported")};var metas=document.head.querySelectorAll("meta");for(i=0;i<metas.length;i++)if(metas[i].name==="viewport")startingState.meta=metas[i].content;}};var resetStartingState=function(rootId){document.body.classList.remove("impress-enabled","impress-disabled");var root=document.getElementById(rootId),active=root.querySelector(".active");if(active)document.body.classList.remove("impress-on-"+active.id);document.documentElement.style.height="";document.body.style.height="";document.body.style.overflow="";var steps=root.querySelectorAll(".step");for(var i=0;i<steps.length;i++){steps[i].classList.remove("future","past","present","active");steps[i].style.position=steps[i].style.transform=steps[i].style["transform-style"]="";}["position","transform-origin","transition","transform-style","top","left","transform"].forEach(function(p){root.style[p]="";});var ss=startingState.roots[rootId].steps,step;while((step=ss.pop()))step.id===null?step.el.removeAttribute("id"):step.el.setAttribute("id",step.id);delete startingState.roots[rootId];root.innerHTML=root.firstChild.innerHTML;if(roots[rootId]){delete roots[rootId];rootsCount--;}if(rootsCount===0){document.body.classList.remove("impress-supported");if(startingState.body.impressNotSupported)document.body.classList.add("impress-not-supported");}};
+})(document,window);
+
+(function(document,window){"use strict";var roots=[];var lf=function(rootId){if(roots[rootId])return roots[rootId];var $=function(s,c){return(c||document).querySelector(s);};var $$=function(s,c){return[].slice.call((c||document).querySelectorAll(s));};var arrayify=function(a){return[].slice.call(a);};var byId=function(id){return document.getElementById(id);};var getElementFromHash=function(){return byId(window.location.hash.replace(/^#\/?/,""));};var throttle=function(fn,delay){var t=null;return function(){var ctx=this,args=arguments;window.clearTimeout(t);t=window.setTimeout(function(){fn.apply(ctx,args);},delay);};};var toNumber=function(n,fallback){return isNaN(n)?(fallback||0):Number(n);};var triggerEvent=function(el,name,detail){var e=document.createEvent("CustomEvent");e.initCustomEvent(name,true,true,detail);el.dispatchEvent(e);};var lib={$:$,$$:$$,arrayify:arrayify,byId:byId,getElementFromHash:getElementFromHash,throttle:throttle,toNumber:toNumber,triggerEvent:triggerEvent};roots[rootId]=lib;return lib;};window.impress.addLibraryFactory({util:lf});
+})(document,window);
+
+(function(document,window){"use strict";document.addEventListener("impress:init",function(e){var api=e.detail.api,gc=api.lib.gc;gc.addEventListener(window,"resize",api.lib.util.throttle(function(){api.goto(document.querySelector(".step.active"),500);},250),false);},false);
+})(document,window);
+
+/* ── PROGRESS BAR ── */
+(function(document){"use strict";var root,stepids=[];var getSteps=function(){stepids=[];var s=root.querySelectorAll(".step");for(var i=0;i<s.length;i++)stepids[i+1]=s[i].id;};document.addEventListener("impress:init",function(e){root=e.target;getSteps();});var pb=document.querySelector("div.impress-progressbar div");if(pb){document.addEventListener("impress:stepleave",function(e){var n=stepids.indexOf(e.detail.next.id);pb.style.width=(100/(stepids.length-1)*n).toFixed(2)+"%";});document.addEventListener("impress:steprefresh",function(e){getSteps();var n=stepids.indexOf(e.target.id);pb.style.width=(100/(stepids.length-1)*n).toFixed(2)+"%";});}
+})(document);
+
+/* ── TOUCH ── */
+(function(document,window){"use strict";var sx=0,lx=0,ldx=0,thr=window.innerWidth/20;document.addEventListener("touchstart",function(e){lx=sx=e.touches[0].clientX;});document.addEventListener("touchmove",function(e){var x=e.touches[0].clientX;ldx=lx-x;lx=x;window.impress().swipe((x-sx)/window.innerWidth);});document.addEventListener("touchend",function(){var d=lx-sx;if(Math.abs(d)>window.innerWidth/5&&d*ldx<=0){d>0&&ldx<=0?window.impress().prev():window.impress().next();}else if(Math.abs(ldx)>thr){ldx<-thr?window.impress().prev():window.impress().next();}else{window.impress().goto(document.querySelector("#impress .step.active"));}});
+})(document,window);
+
+impress().init();
+
+/* ── SLIDE COUNTER ── */
+var allSteps = document.querySelectorAll('.step');
+var total = allSteps.length;
+
+document.addEventListener('impress:stepenter', function(e) {
+  var i = Array.prototype.indexOf.call(allSteps, e.target) + 1;
+  document.getElementById('snum').textContent =
+    (i < 10 ? '0'+i : i) + ' / ' + (total < 10 ? '0'+total : total);
+
+  // init reveals for this slide
+  initReveal(e.target);
+
+  // slide-specific triggers
+  if (i === 2) {
+    setTimeout(function(){
+      animCounter(document.getElementById('cnt1'), 15);
+      animCounter(document.getElementById('cnt2'), 8);
+      animCounter(document.getElementById('cnt3'), 5);
+    }, 700);
+  }
+  if (i === 8) {
+    setTimeout(function(){ animateBars(e.target); }, 400);
+  }
+});
+
+/* ── KEYBOARD: intercept space/right to reveal first ── */
+document.addEventListener('keydown', function(ev) {
+  var isNext = ev.keyCode === 32 || ev.keyCode === 34 || ev.keyCode === 39 || ev.keyCode === 40;
+  var isPrev = ev.keyCode === 33 || ev.keyCode === 37 || ev.keyCode === 38;
+  if (!isNext && !isPrev) return;
+  ev.preventDefault();
+
+  var active = document.querySelector('#impress .step.active');
+  if (isNext && active) {
+    var stayed = !revealNext(active);
+    if (!stayed) impress().next(ev);
+  } else if (isPrev) {
+    impress().prev(ev);
+  }
+});
+
+/* ── COUNTER ANIMATION ── */
+function animCounter(el, target) {
+  if (!el) return;
+  var start = 0, step = Math.ceil(target / 20);
+  var t = setInterval(function() {
+    start += step;
+    if (start >= target) { start = target; clearInterval(t); }
+    el.textContent = start;
+  }, 40);
+}
+
+/* ── BAR ANIMATION ── */
+function animateBars(step) {
+  step.querySelectorAll('.bar-fill[data-w]').forEach(function(el) {
+    el.style.width = '0';
+    setTimeout(function() {
+      el.style.width = el.dataset.w + '%';
+    }, 200);
+  });
+}
+
+/* ── CLICK TO REVEAL / ADVANCE ── */
+document.addEventListener('click', function(ev) {
+  var target = ev.target;
+  // walk up to find .step
+  var step = null;
+  var node = target;
+  while (node && node !== document.documentElement) {
+    if (node.classList && node.classList.contains('step')) { step = node; break; }
+    node = node.parentNode;
+  }
+  if (!step || !step.classList.contains('active')) return;
+  ev.preventDefault();
+  var stayed = !revealNext(step);
+  if (!stayed) impress().next();
+});
+</script>
+</body>
+</html>
